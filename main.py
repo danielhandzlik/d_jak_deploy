@@ -14,7 +14,7 @@ def returns_get():
 def returns_post():
     return {"method": "POST"}
 
-@app.PUT('/PUT')
+@app.put('/PUT')
 def returns_put():
     return {"method": "PUT"}
 
