@@ -6,18 +6,18 @@ app = FastAPI()
 def path_returns_HelloWorld():
     return {"message": "Hello World during the coronavirus pandemic!"}
 
-@app.get('/GET')
+@app.get('/method')
 def returns_get():
     return {"method": "GET"}
 
-@app.post('/POST')
+@app.post('/method')
 def returns_post():
     return {"method": "POST"}
 
-@app.put('/PUT')
+@app.put('/method')
 def returns_put():
     return {"method": "PUT"}
 
-@app.delete('/DELETE')
+@app.delete('/method')
 def returns_get():
     return {"method": "DELETE"}
