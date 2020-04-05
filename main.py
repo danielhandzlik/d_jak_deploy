@@ -6,6 +6,6 @@ app = FastAPI()
 def path_returns_HelloWorld():
     return {"message": "Hello World during the coronavirus pandemic!"}
 
-@app.get('/hello/{name}')
-def hello_name(name: str):
-    return {"message": f"Hello {name}"}
+@app.get('/{method}')
+def returns_method(method: str):
+    return {"method": f"{method}"}
