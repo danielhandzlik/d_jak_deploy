@@ -1,0 +1,73 @@
+python -m venv virtualka
+
+virtualka\Scripts\activate.bat
+
+pip install fastapi[min]
+
+pip freeze
+pip freeze > requirements.txt
+
+pip install uvicorn
+
+pip freeze > requirements.txt
+
+->Tworzymy plik main i zapisujemy main.py
+
+uvicorn main:app
+
+->przegladarka-> http://127.0.0.1:8000/
+
+---------------------nowy cmd
+virtualka\Scripts\activate.bat
+
+pip install pytest
+
+pip install requests
+
+pip freeze
+
+pip freeze > requirements-dev.txt
+
+
+->Tworzymy plik test_main i zapisujemy test_main.py
+
+pytest
+
+->Tworzymy plik Procfile i zapisujemy Procfile
+
+->Tworzymy plik runtime i zapisujemy runtime.txt
+
+---------------------github
+
+git clone //link//
+
+-> przenosimy main.py requirements.txt procfile i runtime.txt do folderu ze sklonowanym repo
+
+cd //nazwa repo//
+
+git status
+
+git add Procfile runtime.txt main.py requirements.txt
+
+git status
+
+git commit -m "first app"
+
+git push origin master
+
+-----------------------heroku
+Zakładamy konto na heroku
+utworzenie nowej aplikacji na heroku: https://dashboard.heroku.com/new-app
+wyklikujemy projekt na heroku i podpinamy pod niego diploj
+- W zakładce Deploy w sekcji Deployment method wybieramy opcję GitHub
+- dodajemy swojego użytkownika
+- wybieramy repo
+- wybieramy opcję automatycznego diploju z mastera
+- Za pierwszym razem diplojujemy ręcznie (przycisk Deploy now na dole)
+- patrzymy w zakładkę Activity
+- Jak się zdiplojuje poprawnie to klikamy Open app
+- podziwiamy jak pięknie i prosto było (jak komuś nie wyszło to debuguje XD)
+od teraz po każdym pushu do mastera diploj będzie się robił sam
+
+
+
