@@ -1,3 +1,41 @@
+import datetime  # do not change this import, use datetime.datetime.now() to get date
+from functools import wraps
+
+#dekorator
+def add_date(format):
+  def wrap(func):
+    @wraps(func)
+    def neww(*args, **kwargs):
+      result = func(*args, **kwargs)
+      result['date']=datetime.datetime.now().strftime(format)
+      return result
+    return neww
+  return wrap
+#dekorator
+def is_correct(*argu):
+    def wrap(decorated):
+        def wrapper(*args, **kwargs):
+            result =decorated(*args, **kwargs)
+            if all(arg in result for arg in argu):
+                return result
+            return None
+        return wrapper
+    return wrap
+#dekorator
+def wraps(to_be_decorated):
+    def wrap(decorated):
+        def wrapper(*args, **kwargs):
+            return decorated(*args, **kwargs)
+        wrapper.__name__ = to_be_decorated.__name__
+        wrapper.__module__ = to_be_decorated.__module__
+        wrapper.__doc__ = to_be_decorated.__doc__
+        wrapper.__qualname__ = to_be_decorated.__qualname__
+        wrapper.__annotations__ = to_be_decorated.__annotations__
+        return wrapper
+    return wrap
+
+
+
 app.counter = 0
 app.patients = []
 
