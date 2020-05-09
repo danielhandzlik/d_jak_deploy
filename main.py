@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from fastapi.encoders import jsonable_encoder
 
 app = FastAPI()
+app.include_router(router, tags=['endpoint zad4'])
 
 class Albums(BaseModel):
     title: str
