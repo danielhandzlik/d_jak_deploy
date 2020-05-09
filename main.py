@@ -74,5 +74,26 @@ async def tracks_composers(response: Response, album_id: int):
 		(album_id, )).fetchone()
 	return album
 
+@router.put("/customers/{customer_id}")
+async def actual_customer(response: Response, customer: Customers, customer_id: int):
+    router.db_connection.row_factory = sql.Row
+    data = router.db_connection.execute("SELECT CustomerId FROM customers WHERE CustomerId = :id",
+    {'id':customer_id}).fetchone()
+    if not data:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return {"detail":{"error":"No client with id"}}
+    update_customer = jsonable_encoder(customer)
+    print(update_customer)
+    changes = ", ".join(f"{key} = '{update_customer[key]}'"
+        for key in update_customer if update_customer[key] != None)
+    updates = router.db_connection.execute(
+        f"UPDATE customers SET {changes} WHERE CustomerId = :id",
+        {'id': customer_id})
+    router.db_connection.commit()
+    router.db_connection.row_factory = sql.Row
+    custome = router.db_connection.execute("SELECT * FROM customers WHERE CustomerId = :id",
+        {'id':customer_id}).fetchone()
+    return custome
+
 app = FastAPI()
 app.include_router(router, tags=['endpoint zad4'])
