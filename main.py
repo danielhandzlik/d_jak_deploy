@@ -95,5 +95,30 @@ async def actual_customer(response: Response, customer: Customers, customer_id: 
         {'id':customer_id}).fetchone()
     return custome
 
+
+@router.get("/sales")
+async def sales(response: Response, category: str):
+    if category == "customers":
+        router.db_connection.row_factory = sql.Row
+        sales = router.db_connection.execute("""
+            SELECT customerid, email, phone, ROUND(SUM(total),2) AS Sum
+            FROM invoices JOIN customers USING(customerid) GROUP BY customerid
+            ORDER BY Sum DESC, customerid
+            """).fetchall()
+        return sales
+    elif category == "genres":
+        router.db_connection.row_factory = sql.Row
+        genres = router.db_connection.execute("""
+            SELECT genres.name, Sum(quantity) AS Sum FROM invoice_items
+            JOIN tracks USING(trackid)
+            JOIN genres USING(genreid)
+            GROUP BY genreid
+            ORDER BY Sum DESC, genres.name
+            """).fetchall()
+        return genres
+    else:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return {"detail":{"error":"Bad category"}}
+
 app = FastAPI()
 app.include_router(router, tags=['endpoint zad4'])
