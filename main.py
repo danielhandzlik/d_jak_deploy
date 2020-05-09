@@ -1,16 +1,10 @@
 from fastapi import FastAPI
-import sqlite3 as sql
 from fastapi import APIRouter, Response, status
 from pydantic import BaseModel
 from fastapi.encoders import jsonable_encoder
-
+import sqlite3 as sql
 
 router = APIRouter()
-
-
-class Albums(BaseModel):
-    title: str
-    artist_id: int
 
 class Customers(BaseModel):
     company: str = None
@@ -21,6 +15,9 @@ class Customers(BaseModel):
     postalcode: str = None
     fax: str = None
 
+class Albums(BaseModel):
+    title: str
+    artist_id: int
 
 @router.on_event("startup")
 async def startup():
@@ -33,23 +30,21 @@ async def shutdown():
 @router.get("/tracks")
 async def tracks(page: int = 0, per_page: int = 10):
     router.db_connection.row_factory = sql.Row
-    tracks = router.db_connection.execute(
+    return router.db_connection.execute(
         "SELECT * FROM tracks ORDER BY TrackId LIMIT :per_page OFFSET :offset",
         {'per_page': per_page, 'offset': page*per_page}).fetchall()
-
-    return tracks
 
 @router.get("/tracks/composers")
 async def composers(response: Response, composer_name: str):
     router.db_connection.row_factory = lambda cursor, x: x[0]
-    data = router.db_connection.execute(
+    if len(router.db_connection.execute(
         "SELECT Name FROM tracks WHERE Composer = :composer ORDER By name",
-        {'composer': composer_name}).fetchall()
-    if len(data) == 0:
+        {'composer': composer_name}).fetchall()) == 0:
         response.status_code = status.HTTP_404_NOT_FOUND
         return {"detail":{"error":"No tracks for composer"}}
-
-    return data
+    return router.db_connection.execute(
+        "SELECT Name FROM tracks WHERE Composer = :composer ORDER By name",
+        {'composer': composer_name}).fetchall()
 
 @router.post("/albums")
 async def album_add(response: Response, album: Albums):
@@ -70,7 +65,6 @@ async def album_add(response: Response, album: Albums):
         "SELECT albumid, title, artistid FROM albums WHERE albumid = :id;",
         {'id': new_album_id }).fetchone()
     response.status_code = status.HTTP_201_CREATED
-
     return album
 
 @router.get("/albums/{album_id}")
@@ -78,9 +72,7 @@ async def tracks_composers(response: Response, album_id: int):
 	router.db_connection.row_factory = sql.Row
 	album = router.db_connection.execute("SELECT * FROM albums WHERE AlbumId = ?",
 		(album_id, )).fetchone()
-
 	return album
-
 
 @router.put("/customers/{customer_id}")
 async def actual_customer(response: Response, customer: Customers, customer_id: int):
@@ -90,9 +82,7 @@ async def actual_customer(response: Response, customer: Customers, customer_id: 
     if not data:
         response.status_code = status.HTTP_404_NOT_FOUND
         return {"detail":{"error":"No client with id"}}
-
     update_customer = jsonable_encoder(customer)
-    #update_customer = customer.dict(exclude_unset=True)
     print(update_customer)
     changes = ", ".join(f"{key} = '{update_customer[key]}'"
         for key in update_customer if update_customer[key] != None)
@@ -100,13 +90,10 @@ async def actual_customer(response: Response, customer: Customers, customer_id: 
         f"UPDATE customers SET {changes} WHERE CustomerId = :id",
         {'id': customer_id})
     router.db_connection.commit()
-
     router.db_connection.row_factory = sql.Row
     custome = router.db_connection.execute("SELECT * FROM customers WHERE CustomerId = :id",
         {'id':customer_id}).fetchone()
-
     return custome
-
 
 @router.get("/sales")
 async def sales(response: Response, category: str):
@@ -117,7 +104,6 @@ async def sales(response: Response, category: str):
             FROM invoices JOIN customers USING(customerid) GROUP BY customerid
             ORDER BY Sum DESC, customerid
             """).fetchall()
-
         return sales
     elif category == "genres":
         router.db_connection.row_factory = sql.Row
@@ -128,14 +114,10 @@ async def sales(response: Response, category: str):
             GROUP BY genreid
             ORDER BY Sum DESC, genres.name
             """).fetchall()
-
         return genres
     else:
         response.status_code = status.HTTP_404_NOT_FOUND
         return {"detail":{"error":"Bad category"}}
-
-
-
 
 app = FastAPI()
 app.include_router(router, tags=['endpoint zad4'])
