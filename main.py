@@ -5,6 +5,8 @@ from pydantic import BaseModel
 from fastapi.encoders import jsonable_encoder
 
 app = FastAPI()
+
+router = APIRouter()
 app.include_router(router, tags=['endpoint zad4'])
 
 class Albums(BaseModel):
@@ -20,7 +22,6 @@ class Customers(BaseModel):
     postalcode: str = None
     fax: str = None
 
-router = APIRouter()
 
 @router.on_event("startup")
 async def startup():
