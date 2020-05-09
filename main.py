@@ -4,6 +4,8 @@ from fastapi import APIRouter, Response, status
 from pydantic import BaseModel
 from fastapi.encoders import jsonable_encoder
 
+app = FastAPI()
+
 class Albums(BaseModel):
     title: str
     artist_id: int
