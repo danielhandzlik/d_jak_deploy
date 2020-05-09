@@ -4,10 +4,9 @@ from fastapi import APIRouter, Response, status
 from pydantic import BaseModel
 from fastapi.encoders import jsonable_encoder
 
-app = FastAPI()
 
 router = APIRouter()
-app.include_router(router, tags=['endpoint zad4'])
+
 
 class Albums(BaseModel):
     title: str
@@ -134,3 +133,9 @@ async def sales(response: Response, category: str):
     else:
         response.status_code = status.HTTP_404_NOT_FOUND
         return {"detail":{"error":"Bad category"}}
+
+
+
+
+app = FastAPI()
+app.include_router(router, tags=['endpoint zad4'])
